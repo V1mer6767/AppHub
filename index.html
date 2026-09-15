@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
+<title>Мої застосунки</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+<link rel="apple-touch-icon" href="icons/icon-180.png"/>
+<meta name="theme-color" content="#6c5ce7"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Мої застосунки"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #0e0e13;
+  --surface: #17171e;
+  --surface2: #1e1e27;
+  --line: rgba(255,255,255,0.07);
+  --text: #f2f2f5;
+  --dim: #8b8b97;
+  --dim2: #56565f;
+  --accent: #6c5ce7;
+  --font: 'Inter', -apple-system, ui-sans-serif, sans-serif;
+}
+
+html, body { height: 100%; overscroll-behavior: none; }
+body {
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-user-select: none; user-select: none;
+  padding-bottom: 24px;
+}
+input { -webkit-user-select: text; user-select: text; }
+
+header { padding: 24px 18px 14px; }
+.h-title { font-size: 26px; font-weight: 800; letter-spacing: -.4px; }
+.h-sub { font-size: 13px; color: var(--dim); margin-top: 4px; }
+
+.search-wrap { padding: 0 18px 16px; position: sticky; top: 0; background: var(--bg); z-index: 5; }
+.search-box {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 12px 14px;
+}
+.search-box input {
+  flex: 1; border: none; background: none; outline: none;
+  color: var(--text); font-family: var(--font); font-size: 14px;
+}
+.search-box input::placeholder { color: var(--dim2); }
+.search-box .s-icon { color: var(--dim); font-size: 15px; }
+.search-clear { color: var(--dim); font-size: 15px; cursor: pointer; display: none; }
+.search-clear.show { display: block; }
+
+.grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  padding: 0 18px;
+}
+.app-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+  padding: 16px 14px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 10px;
+  text-decoration: none; color: var(--text);
+  transition: transform .1s;
+}
+.app-card:active { transform: scale(.96); }
+.app-icon {
+  width: 44px; height: 44px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 21px;
+}
+.app-name { font-size: 13.5px; font-weight: 700; letter-spacing: -.1px; line-height: 1.25; }
+.app-tag { font-size: 11px; color: var(--dim); line-height: 1.4; }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--dim); grid-column: 1 / -1; }
+.empty-state .es-icon { font-size: 36px; display: block; margin-bottom: 10px; }
+
+.section-lbl {
+  padding: 18px 18px 4px; font-size: 12px; font-weight: 700; color: var(--dim);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-title">Мої застосунки</div>
+  <div class="h-sub">Усе в одному місці — не треба шукати на екрані</div>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <span class="s-icon">🔍</span>
+    <input type="text" id="search" placeholder="Пошук застосунку..." oninput="renderGrid()"/>
+    <span class="search-clear" id="search-clear" onclick="clearSearch()">✕</span>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const APPS = [
+  { name: "LoneIsle", icon: "🏝️", tag: "Острів-білдер", url: "https://v1mer6767.github.io/LoneIsle-/", color: "#7fce6b" },
+  { name: "FitTrack", icon: "💪", tag: "Трекер тренувань", url: "https://v1mer6767.github.io/Fittrack/", color: "#ff5a36" },
+  { name: "MoneyLeaks", icon: "₴", tag: "Контроль витрат", url: "https://v1mer6767.github.io/MoneyLeaks/", color: "#ff8c42" },
+  { name: "Fit-track", icon: "🏋️", tag: "Трекер тренувань", url: "https://v1mer6767.github.io/Fit-track/", color: "#4f8ef7" },
+  { name: "WakeUpStronger", icon: "⏰", tag: "Будильник", url: "https://v1mer6767.github.io/WakeUpStronger/", color: "#a855f7" },
+  { name: "Work", icon: "🕒", tag: "Робочі години", url: "https://v1mer6767.github.io/Work/", color: "#4fd98a" },
+  { name: "Yaromyr", icon: "📝", tag: "Нотатник і завдання", url: "https://v1mer6767.github.io/Yaromyr/", color: "#ffc247" },
+  { name: "Exchange rates", icon: "💱", tag: "Курси валют", url: "https://v1mer6767.github.io/Exchange-rates/", color: "#4a9eff" },
+];
+
+function openApp(url) {
+  window.location.href = url;
+}
+
+function clearSearch() {
+  document.getElementById('search').value = '';
+  renderGrid();
+}
+
+function renderGrid() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  document.getElementById('search-clear').classList.toggle('show', q.length > 0);
+  const filtered = q ? APPS.filter(a => a.name.toLowerCase().includes(q) || a.tag.toLowerCase().includes(q)) : APPS;
+  const grid = document.getElementById('grid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-state"><span class="es-icon">🔍</span>Нічого не знайдено</div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(a => `
+    <div class="app-card" onclick="openApp('${a.url}')">
+      <div class="app-icon" style="background:${a.color}26;color:${a.color};">${a.icon}</div>
+      <div>
+        <div class="app-name">${a.name}</div>
+        <div class="app-tag">${a.tag}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+renderGrid();
+</script>
+</body>
+</html>
