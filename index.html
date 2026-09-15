@@ -44,6 +44,40 @@ header { padding: 24px 18px 14px; }
 .h-title { font-size: 26px; font-weight: 800; letter-spacing: -.4px; }
 .h-sub { font-size: 13px; color: var(--dim); margin-top: 4px; }
 
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+  background: var(--surface2); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--dim); font-size: 16px; cursor: pointer;
+}
+.icon-btn.spinning { animation: hub-spin .5s linear; color: var(--accent); }
+@keyframes hub-spin { to { transform: rotate(360deg); } }
+
+/* ---------- splash screen ---------- */
+.splash {
+  position: fixed; inset: 0; z-index: 999;
+  background: radial-gradient(circle at 50% 38%, #1c1c24 0%, #0e0e13 70%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity .5s ease, visibility .5s ease;
+}
+.splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  width: 112px; height: 112px;
+}
+.splash-sq {
+  border-radius: 18px;
+  animation: splash-pop 1.6s ease-in-out infinite;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+}
+.splash-sq:nth-child(1) { background: linear-gradient(135deg, #8b7cf0, #6c5ce7); animation-delay: 0s; }
+.splash-sq:nth-child(2) { background: linear-gradient(135deg, #ff8a63, #ff5a36); animation-delay: .15s; }
+.splash-sq:nth-child(3) { background: linear-gradient(135deg, #7ce8a8, #4fd98a); animation-delay: .3s; }
+.splash-sq:nth-child(4) { background: linear-gradient(135deg, #79bcff, #4a9eff); animation-delay: .45s; }
+@keyframes splash-pop { 0%,100% { transform: scale(1); } 50% { transform: scale(.88); } }
+.splash-title { font-size: 24px; font-weight: 800; letter-spacing: -.4px; margin-top: 30px; }
+.splash-tagline { font-size: 13px; color: var(--dim); margin-top: 6px; }
+
 .search-wrap { padding: 0 18px 16px; position: sticky; top: 0; background: var(--bg); z-index: 5; }
 .search-box {
   display: flex; align-items: center; gap: 10px;
@@ -90,9 +124,25 @@ header { padding: 24px 18px 14px; }
 </head>
 <body>
 
+<div class="splash" id="splash">
+  <div class="splash-grid">
+    <div class="splash-sq"></div>
+    <div class="splash-sq"></div>
+    <div class="splash-sq"></div>
+    <div class="splash-sq"></div>
+  </div>
+  <div class="splash-title">Мої застосунки</div>
+  <div class="splash-tagline">Усе в одному місці</div>
+</div>
+
 <header>
-  <div class="h-title">Мої застосунки</div>
-  <div class="h-sub">Усе в одному місці — не треба шукати на екрані</div>
+  <div style="display:flex; align-items:center; justify-content:space-between;">
+    <div>
+      <div class="h-title">Мої застосунки</div>
+      <div class="h-sub">Усе в одному місці — не треба шукати на екрані</div>
+    </div>
+    <button class="icon-btn" id="btn-refresh" onclick="refreshApp()" title="Оновити">↻</button>
+  </div>
 </header>
 
 <div class="search-wrap">
@@ -147,6 +197,16 @@ function renderGrid() {
 }
 
 renderGrid();
+
+function refreshApp() {
+  const btn = document.getElementById('btn-refresh');
+  btn.classList.add('spinning');
+  setTimeout(() => location.reload(), 400);
+}
+
+setTimeout(() => {
+  document.getElementById('splash').classList.add('hide');
+}, 1100);
 </script>
 </body>
 </html>
